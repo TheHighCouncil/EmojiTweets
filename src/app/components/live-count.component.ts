@@ -22,9 +22,9 @@ export class LiveCountComponent implements OnInit {
   public ngOnInit() {
     this.emojiUpdatesNotifyObservable = this.emojiTrackerService.emojiUpdatesNotify();
     this.emojiUpdatesNotifyObservable.subscribe(data => {
-      this.emojiCounts.push(data);
+      this.emojiCounts.unshift(data);
       if (this.emojiCounts.length > 20) {
-        this.emojiCounts.shift();
+        this.emojiCounts.pop();
       }
       this.ref.detectChanges(); // TODO check why this is necessary
     });
