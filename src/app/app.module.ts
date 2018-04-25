@@ -22,7 +22,7 @@ import { TweetStreamComponent } from './components/tweet-stream.component';
   ],
   imports: [
     BrowserModule,
-    RouterModule.forRoot(appRoutes, { enableTracing: true }),
+    RouterModule.forRoot(appRoutes),
     HttpClientModule,
     NgbModule.forRoot()
   ],
