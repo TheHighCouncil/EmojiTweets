@@ -18,9 +18,18 @@ export class EmojiTrackerService {
   }
 
   emojiTopN() {
-    console.log(this.http);
     return this.http.get(
       'http://localhost:8881/interactive/queries/emojis/stats/topN'
     );
+  }
+
+  emojiTweetStream(emojiCode) {
+    return new Observable(observer => {
+      const eventSource = new EventSource(
+        `http://localhost:8881/interactive/queries/emojis/${emojiCode}/tweets`
+      );
+      eventSource.onmessage = event => observer.next(JSON.parse(event.data));
+      eventSource.onerror = error => observer.error(error);
+    });
   }
 }
