@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { ChangeDetectorRef } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
+import { Subscription } from 'rxjs/Subscription';
 
 import { EmojiTrackerService } from '../services/emoji-tracker.service';
 
@@ -9,24 +10,34 @@ import { EmojiTrackerService } from '../services/emoji-tracker.service';
   templateUrl: './live-count.component.html',
   styleUrls: ['./live-count.component.scss']
 })
-export class LiveCountComponent implements OnInit {
+export class LiveCountComponent implements OnInit, OnDestroy {
+  @Input() track = true;
   emojiCounts: Array<any> = [];
-  count = 2;
   emojiUpdatesNotifyObservable: Observable<any>;
+  emojiUpdatesNotifySubject: Subscription;
 
   constructor(
     private emojiTrackerService: EmojiTrackerService,
     private ref: ChangeDetectorRef
   ) {}
 
-  public ngOnInit() {
-    this.emojiUpdatesNotifyObservable = this.emojiTrackerService.emojiUpdatesNotify();
-    this.emojiUpdatesNotifyObservable.subscribe(data => {
-      this.emojiCounts.unshift(data);
-      if (this.emojiCounts.length > 20) {
-        this.emojiCounts.pop();
-      }
-      this.ref.detectChanges(); // TODO check why this is necessary
-    });
+  ngOnInit() {
+    this.emojiUpdatesNotifySubject = this.emojiTrackerService
+      .emojiUpdatesNotify()
+      .subscribe(data => {
+        if (this.track) {
+          this.emojiCounts.unshift(data);
+          if (this.emojiCounts.length > 20) {
+            this.emojiCounts.pop();
+          }
+          this.ref.detectChanges(); // TODO check why this is necessary
+        }
+      });
+  }
+
+  ngOnDestroy() {
+    if (this.emojiUpdatesNotifySubject) {
+      this.emojiUpdatesNotifySubject.unsubscribe();
+    }
   }
 }

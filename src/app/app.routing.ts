@@ -1,7 +1,8 @@
 import { Routes } from '@angular/router';
 
-import { TweetStreamComponent } from './components/tweet-stream.component';
+import { WrapperComponent } from './components/wrapper.component';
 
 export const appRoutes: Routes = [
-  { path: ':emojicode', component: TweetStreamComponent }
+  { path: ':emojicode', component: WrapperComponent },
+  { path: '', component: WrapperComponent }
 ];

@@ -1,3 +1,6 @@
 <div *ngFor="let tweet of tweetStreamData">
-  <div class="card m-1 p-1">{{tweet.t2}}</div>
+  <div class="card m-2 p-2 px-2">{{tweet.t2}}</div>
+</div>
+<div *ngIf="tweetStreamData.length === 0" class="placeholder">
+  Waiting for Tweets
 </div>

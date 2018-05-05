@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 import { ChangeDetectorRef } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
@@ -11,11 +11,12 @@ import { EmojiTrackerService } from '../services/emoji-tracker.service';
   templateUrl: './tweet-stream.component.html',
   styleUrls: ['./tweet-stream.component.scss']
 })
-export class TweetStreamComponent implements OnInit {
+export class TweetStreamComponent implements OnInit, OnDestroy {
   emojiCode: string;
   tweetStreamData: Array<any> = [];
   emojiTweetStreamObservable: Observable<any>;
   emojiTweetStreamSubject: Subscription;
+  routeSubject: Subscription;
 
   constructor(
     private route: ActivatedRoute,
@@ -24,10 +25,13 @@ export class TweetStreamComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    const blub = this.route.params.subscribe(params => {
+    // if (this.routeSubject) {
+    //   this.routeSubject.unsubscribe();
+    // }
+    this.routeSubject = this.route.params.subscribe(params => {
+      console.log(params);
       this.emojiCode = params['emojicode'];
       this.tweetStreamData = [];
-      console.log('NAVIGATE!!!', params);
       this.emojiTweetStreamObservable = this.emojiTrackerService.emojiTweetStream(
         this.emojiCode
       );
@@ -38,7 +42,6 @@ export class TweetStreamComponent implements OnInit {
 
       this.emojiTweetStreamSubject = this.emojiTweetStreamObservable.subscribe(
         data => {
-          console.log(data);
           this.tweetStreamData.unshift(data);
           if (this.tweetStreamData.length > 20) {
             this.tweetStreamData.pop();
@@ -47,5 +50,14 @@ export class TweetStreamComponent implements OnInit {
         }
       );
     });
+  }
+
+  ngOnDestroy() {
+    if (this.emojiTweetStreamSubject) {
+      this.emojiTweetStreamSubject.unsubscribe();
+    }
+    if (this.routeSubject) {
+      this.routeSubject.unsubscribe();
+    }
   }
 }

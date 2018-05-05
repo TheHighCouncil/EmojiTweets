@@ -11,6 +11,7 @@ import { EmojiBubbleComponent } from './components/emoji-bubble.component';
 import { TopNComponent } from './components/top-n.component';
 import { EmojiTrackerService } from './services/emoji-tracker.service';
 import { TweetStreamComponent } from './components/tweet-stream.component';
+import { WrapperComponent } from './components/wrapper.component';
 
 @NgModule({
   declarations: [
@@ -18,7 +19,8 @@ import { TweetStreamComponent } from './components/tweet-stream.component';
     LiveCountComponent,
     EmojiBubbleComponent,
     TopNComponent,
-    TweetStreamComponent
+    TweetStreamComponent,
+    WrapperComponent
   ],
   imports: [
     BrowserModule,

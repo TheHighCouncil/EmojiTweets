@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
+import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 
 import { EmojiTrackerService } from '../services/emoji-tracker.service';
 
@@ -9,15 +10,19 @@ import { EmojiTrackerService } from '../services/emoji-tracker.service';
   styleUrls: ['./top-n.component.scss']
 })
 export class TopNComponent {
+  emojiCode: string;
   emojiUpdatesNotifyObservable: Observable<any>;
   emojiDataObjects: Array<any> = [];
 
-  constructor(private emojiTrackerService: EmojiTrackerService) {
-    console.log('init');
+  constructor(
+    private route: ActivatedRoute,
+    private emojiTrackerService: EmojiTrackerService
+  ) {
+    this.route.params.subscribe(params => {
+      this.emojiCode = params['emojicode'];
+    });
     this.emojiUpdatesNotifyObservable = this.emojiTrackerService.emojiTopN();
-    console.log(this.emojiUpdatesNotifyObservable);
     this.emojiUpdatesNotifyObservable.subscribe(data => {
-      console.log(data);
       this.emojiDataObjects = data;
     });
   }

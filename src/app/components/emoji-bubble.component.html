@@ -1,10 +1,8 @@
-<a [routerLink]="[emojiData.emoji]">
-  <div class="emoji-count-bubble">
-    <div class="emoji">
-      <span>{{emojiData.emoji}}</span>
-    </div>
-    <div class="count">
-      <span>{{emojiData.count}}</span>
-    </div>
+<div [routerLink]="'/' + emojiData.emoji" class="emoji-count-bubble">
+  <div class="emoji ">
+    <span>{{emojiData.emoji}}</span>
   </div>
-</a>
+  <div class="count ">
+    <span>{{emojiData.count}}</span>
+  </div>
+</div>
