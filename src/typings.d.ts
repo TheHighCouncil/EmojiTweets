@@ -5,4 +5,9 @@ interface NodeModule {
   id: string;
 }
 
+declare type EmojiData = {
+  emoji: string;
+  count: number;
+};
+
 declare var EventSource: any;
