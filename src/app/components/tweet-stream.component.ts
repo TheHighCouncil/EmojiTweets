@@ -28,10 +28,11 @@ export class TweetStreamComponent implements OnInit, OnDestroy {
     // if (this.routeSubject) {
     //   this.routeSubject.unsubscribe();
     // }
-    this.routeSubject = this.route.params.subscribe(params => {
+    this.routeSubject = this.route.queryParams.subscribe(params => {
       console.log(params);
-      this.emojiCode = params['emojicode'];
+      this.emojiCode = params['emoji'];
       this.tweetStreamData = [];
+      this.ref.detectChanges(); // TODO check why this is necessary
       this.emojiTweetStreamObservable = this.emojiTrackerService.emojiTweetStream(
         this.emojiCode
       );

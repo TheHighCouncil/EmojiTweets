@@ -7,12 +7,19 @@ import { fromEventSource } from '../utils/rxjs.util';
 
 @Injectable()
 export class EmojiTrackerService {
+  observables: { [key: string]: Observable<any> } = {};
+
   constructor(private http: HttpClient) {}
 
   emojiUpdatesNotify() {
-    return fromEventSource(
-      'http://localhost:8881/interactive/queries/emojis/updates/notify'
-    );
+    const url =
+      'http://localhost:8881/interactive/queries/emojis/updates/notify';
+    if (!this.observables[url]) {
+      const observable = fromEventSource(url);
+      return this.observables[url] = observable;
+    } else {
+      return this.observables[url];
+    }
   }
 
   emojiTopN() {

@@ -16,8 +16,8 @@ export class WrapperComponent implements OnInit, OnDestroy {
   constructor(private route: ActivatedRoute, private ref: ChangeDetectorRef) {}
 
   ngOnInit() {
-    this.routeSubject = this.route.params.subscribe(params => {
-      this.emojiCode = params['emojicode'];
+    this.routeSubject = this.route.queryParams.subscribe(params => {
+      this.emojiCode = params['emoji'];
       this.ref.detectChanges(); // TODO check why this is necessary
     });
   }

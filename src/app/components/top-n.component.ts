@@ -24,8 +24,8 @@ export class TopNComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    this.route.params.subscribe(params => {
-      this.emojiCode = params['emojicode'];
+    this.route.queryParams.subscribe(params => {
+      this.emojiCode = params['emoji'];
     });
     this.emojiUpdatesNotifyObservable = this.emojiTrackerService.emojiTopN();
     this.emojiUpdatesNotifyObservable.subscribe(data => {
@@ -38,11 +38,17 @@ export class TopNComponent implements OnInit, OnDestroy {
           (object: EmojiData) => object.emoji === data.emoji
         );
         if (i > -1) {
-          this.emojiDataObjects[i] = data;
-          this.emojiDataObjects = this.emojiDataObjects.sort(
-            (a: EmojiData, b: EmojiData) => b.count - a.count
-          );
-          this.ref.detectChanges();
+          if (this.emojiDataObjects[i].count !== data.count) {
+            this.emojiDataObjects[i].updated = true;
+            this.ref.detectChanges();
+            setTimeout(() => {
+              this.emojiDataObjects[i] = {...data, updated: false};
+              this.emojiDataObjects = this.emojiDataObjects.sort(
+                (a: EmojiData, b: EmojiData) => b.count - a.count
+              );
+              this.ref.detectChanges();
+            }, 500);
+          }
         }
       });
   }

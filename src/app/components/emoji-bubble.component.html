@@ -1,4 +1,4 @@
-<div [routerLink]="'/' + emojiData.emoji" class="emoji-count-bubble">
+<div routerLink="/dashboard" [queryParams]="{emoji: emojiData.emoji}" class="emoji-count-bubble {{emojiData.updated ? 'updated' : ''}}">
   <div class="emoji ">
     <span>{{emojiData.emoji}}</span>
   </div>
