@@ -44,10 +44,15 @@ export const fromEventSource = (url): Observable<any> => {
 //   });
 // };
 
-export const queueUp = maxLength => source => {
-  const queue = [];
-  return new Observable(observer =>
-    source.subscribe(
+export const queueUp = (maxLength, reset$ = null) => source =>
+  new Observable(observer => {
+    let queue = [];
+    if (reset$) {
+      reset$.subscribe(() => {
+        queue = [];
+      });
+    }
+    return source.subscribe(
       value => {
         try {
           queue.unshift(value);
@@ -61,6 +66,5 @@ export const queueUp = maxLength => source => {
       },
       err => observer.error(err),
       () => observer.complete()
-    )
-  );
-};
+    );
+  });

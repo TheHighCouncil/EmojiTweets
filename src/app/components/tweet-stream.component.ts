@@ -2,7 +2,9 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 import { ChangeDetectorRef } from '@angular/core';
 import { Observable ,  Subscription } from 'rxjs';
+import { map, mergeMap, tap, debounce, debounceTime } from 'rxjs/operators';
 
+import { queueUp } from '../utils/rxjs.util';
 import { EmojiTrackerService } from '../services/emoji-tracker.service';
 
 @Component({
@@ -10,54 +12,19 @@ import { EmojiTrackerService } from '../services/emoji-tracker.service';
   templateUrl: './tweet-stream.component.html',
   styleUrls: ['./tweet-stream.component.scss']
 })
-export class TweetStreamComponent implements OnInit, OnDestroy {
-  emojiCode: string;
-  tweetStreamData: Array<any> = [];
-  emojiTweetStreamObservable: Observable<any>;
-  emojiTweetStreamSubject: Subscription;
-  routeSubject: Subscription;
+export class TweetStreamComponent {
+  emojiCode$: Observable<string>;
+  emojiTweetStream$: Observable<any>;
 
   constructor(
     private route: ActivatedRoute,
     private emojiTrackerService: EmojiTrackerService,
     private ref: ChangeDetectorRef
-  ) {}
-
-  ngOnInit() {
-    // if (this.routeSubject) {
-    //   this.routeSubject.unsubscribe();
-    // }
-    this.routeSubject = this.route.queryParams.subscribe(params => {
-      console.log(params);
-      this.emojiCode = params['emoji'];
-      this.tweetStreamData = [];
-      this.ref.detectChanges(); // TODO check why this is necessary
-      this.emojiTweetStreamObservable = this.emojiTrackerService.emojiTweetStream(
-        this.emojiCode
-      );
-
-      if (this.emojiTweetStreamSubject) {
-        this.emojiTweetStreamSubject.unsubscribe();
-      }
-
-      this.emojiTweetStreamSubject = this.emojiTweetStreamObservable.subscribe(
-        data => {
-          this.tweetStreamData.unshift(data);
-          if (this.tweetStreamData.length > 20) {
-            this.tweetStreamData.pop();
-          }
-          this.ref.detectChanges(); // TODO check why this is necessary
-        }
-      );
-    });
-  }
-
-  ngOnDestroy() {
-    if (this.emojiTweetStreamSubject) {
-      this.emojiTweetStreamSubject.unsubscribe();
-    }
-    if (this.routeSubject) {
-      this.routeSubject.unsubscribe();
-    }
+  ) {
+    // TODO unsubscribe on routing and empty array
+    this.emojiCode$ = this.route.queryParams.pipe(map(params => params['emoji']));
+    this.emojiTweetStream$ = this.emojiCode$.pipe(mergeMap(emojiCode => this.emojiTrackerService.emojiTweetStream(
+      emojiCode
+    )), tap(val => console.log(val)), queueUp(20, this.emojiCode$), tap(val => console.log('after', val)));
   }
 }
