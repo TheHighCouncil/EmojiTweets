@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 
 import { environment } from '../../environments/environment';
 import { fromEventSource } from '../utils/rxjs.util';
@@ -11,7 +11,7 @@ export class EmojiTrackerService {
 
   constructor(private http: HttpClient) {}
 
-  emojiUpdatesNotify() {
+  emojiUpdatesNotify(): Observable<EmojiData> {
     const url =
       'http://localhost:8881/interactive/queries/emojis/updates/notify';
     if (!this.observables[url]) {

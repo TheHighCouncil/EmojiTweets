@@ -6,9 +6,12 @@ interface NodeModule {
 }
 
 declare type EmojiData = {
-  emoji: string;
-  count: number;
-  updated?: boolean;
+  emoji: string,
+  count: number,
+  updated?: boolean
 };
 
-declare var EventSource: any;
+declare var EventSource: {
+  new(url: string, eventSourceInitDict?: EventSourceInit): EventSource,
+  prototype: EventSource
+};

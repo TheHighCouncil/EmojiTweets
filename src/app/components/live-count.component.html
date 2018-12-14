@@ -1,3 +1,4 @@
+
 <div class="wrapper">
-  <app-emoji-bubble *ngFor="let emojiCount of emojiCounts" [emojiData]="emojiCount"></app-emoji-bubble>
+  <app-emoji-bubble *ngFor="let emojiCount of (emojiUpdateQueue$ | async)" [emojiData]="emojiCount"></app-emoji-bubble>
 </div>

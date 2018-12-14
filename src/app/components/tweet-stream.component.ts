@@ -1,8 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 import { ChangeDetectorRef } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
-import { Subscription } from 'rxjs/Subscription';
+import { Observable ,  Subscription } from 'rxjs';
 
 import { EmojiTrackerService } from '../services/emoji-tracker.service';
 

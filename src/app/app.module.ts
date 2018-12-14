@@ -1,6 +1,6 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule, OnInit } from '@angular/core';
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+// import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { HttpClientModule } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
 
@@ -26,7 +26,7 @@ import { WrapperComponent } from './components/wrapper.component';
     BrowserModule,
     RouterModule.forRoot(appRoutes),
     HttpClientModule,
-    NgbModule.forRoot()
+    // NgbModule.forRoot()
   ],
   providers: [EmojiTrackerService],
   bootstrap: [AppComponent]
