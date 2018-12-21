@@ -1,101 +1,61 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Observable ,  Subscription } from 'rxjs';
+import { Component, OnInit } from '@angular/core';
+import { Observable , Subscription, interval } from 'rxjs';
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 import { ChangeDetectorRef } from '@angular/core';
 
 import { EmojiTrackerService } from '../services/emoji-tracker.service';
+import { map, delay, merge, concatMapTo, tap, distinctUntilChanged, sample } from 'rxjs/operators';
 
 @Component({
   selector: 'app-top-n',
   templateUrl: './top-n.component.html',
   styleUrls: ['./top-n.component.scss']
 })
-export class TopNComponent implements OnInit, OnDestroy {
-  emojiUpdatesNotifyObservable: Observable<any>;
-  emojiUpdatesNotifySubject: Subscription;
-  emojiCode: string;
-  emojiDataObjects: Array<any> = [];
+export class TopNComponent implements OnInit {
+  emojiUpdate$: Observable<any>;
+  emojiTopN$: Observable<any>;
+  currentTopN$: Observable<any>;
 
   constructor(
-    private route: ActivatedRoute,
     private emojiTrackerService: EmojiTrackerService,
-    private ref: ChangeDetectorRef
   ) {}
 
   ngOnInit() {
-    this.route.queryParams.subscribe(params => {
-      this.emojiCode = params['emoji'];
-    });
-    this.emojiUpdatesNotifyObservable = this.emojiTrackerService.emojiTopN();
-    this.emojiUpdatesNotifyObservable.subscribe(data => {
-      this.emojiDataObjects = data;
-    });
-    this.emojiUpdatesNotifySubject = this.emojiTrackerService
-      .emojiUpdatesNotify()
-      .subscribe((data: EmojiData) => {
-        // console.log(`\n---------------------------------------`);
-        // console.log(
-        //   `[Top-N] Update by emoji (${data.emoji}) Object-Count: ${
-        //     this.emojiDataObjects.length
-        //   }`
-        // );
-        const i = this.emojiDataObjects.findIndex(
-          (object: EmojiData) => object.emoji === data.emoji
-        );
-        // console.log(`[Top-N] Object-Index: ${i}`);
-        if (i > -1) {
-          if (this.emojiDataObjects[i].count !== data.count) {
-            // console.log(
-            //   `[Top-N] Will Update, Old count: ${
-            //     this.emojiDataObjects[i].count
-            //   } / New count: ${data.count}`
-            // );
-            this.emojiDataObjects[i] = { ...data, updated: true };
-            // console.log(
-            //   `[Top-N] Updated index (${i}), count: ${
-            //     this.emojiDataObjects[i].count
-            //   }, emoji: ${this.emojiDataObjects[i].emoji}`
-            // );
-            this.ref.detectChanges();
-            this.emojiDataObjects = this.emojiDataObjects.sort(
-              (a: EmojiData, b: EmojiData) => {
-                return (
-                  (b.count + 1 / b.emoji.charCodeAt(1)) -
-                  (a.count + 1 / a.emoji.charCodeAt(1))
-                );
-              }
-            );
-            // console.log(
-            //   `[Top-N] Object-Count after sorting: ${
-            //     this.emojiDataObjects.length
-            //   }`
-            // );
-            // console.log(
-            //   `[Top-N] Begin animation of ${this.emojiDataObjects[i].emoji}`
-            // );
-            setTimeout(() => {
-              // console.log(
-              //   `[Top-N] End animation of ${this.emojiDataObjects[i].emoji}`
-              // );
-              this.emojiDataObjects[i].updated = false;
-              this.ref.detectChanges();
-              // console.log(
-              //   `[Top-N] Object-Count after animation: ${
-              //     this.emojiDataObjects.length
-              //   }`
-              // );
-              // console.log(`---------------------------------------\n`);
-            }, 500);
-          }
+    const n = 25;
+    this.emojiTopN$ = this.emojiTrackerService.emojiTopN();
+    this.emojiUpdate$ = this.emojiTrackerService.emojiUpdatesNotify();
+    const topN$ = this.emojiTopN$.pipe(
+      concatMapTo(this.emojiUpdate$, (emojiMap, updateEmojiData) => {
+        const emojiIndex = emojiMap.findIndex(val => val.emoji === updateEmojiData.emoji);
+        if (emojiIndex > -1) {
+          emojiMap[emojiIndex] = {
+            ...updateEmojiData,
+            update: emojiMap[emojiIndex].count === updateEmojiData.count
+          };
         } else {
-          // console.log(`---------------------------------------\n`);
+          emojiMap.push({
+            ...updateEmojiData,
+            update: false
+          });
         }
-      });
-  }
+        return emojiMap.slice(0, n);
+      }),
+      map((emojiMap: any[]) => emojiMap.sort(
+        (a: EmojiData, b: EmojiData) => (
+            (b.count + 1 / b.emoji.charCodeAt(1)) -
+            (a.count + 1 / a.emoji.charCodeAt(1))
+          ))),
 
-  ngOnDestroy() {
-    if (this.emojiUpdatesNotifySubject) {
-      this.emojiUpdatesNotifySubject.unsubscribe();
-    }
+    );
+    this.currentTopN$ = topN$.pipe(
+      merge(topN$.pipe(
+        delay(500),
+        map((emojiMap: any[]) => emojiMap.map(emojiData => ({...emojiData, update: false})))
+      )),
+      tap(val => { console.log(val); }),
+      distinctUntilChanged(),
+      sample(interval(1000)),
+    );
+
   }
 }

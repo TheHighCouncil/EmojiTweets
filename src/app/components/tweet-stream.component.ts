@@ -19,12 +19,11 @@ export class TweetStreamComponent {
   constructor(
     private route: ActivatedRoute,
     private emojiTrackerService: EmojiTrackerService,
-    private ref: ChangeDetectorRef
   ) {
     // TODO unsubscribe on routing and empty array
     this.emojiCode$ = this.route.queryParams.pipe(map(params => params['emoji']));
     this.emojiTweetStream$ = this.emojiCode$.pipe(mergeMap(emojiCode => this.emojiTrackerService.emojiTweetStream(
       emojiCode
-    )), tap(val => console.log(val)), queueUp(20, this.emojiCode$), tap(val => console.log('after', val)));
+    )), queueUp(20, this.emojiCode$));
   }
 }
