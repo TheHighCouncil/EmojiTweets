@@ -1,6 +1,6 @@
-<div *ngFor="let tweet of (emojiTweetStream$ | async)">
-  <div class="card m-2 p-2 px-2">{{tweet.t2}}</div>
+<div class="wrapper" *ngFor="let tweet of (emojiTweetStream$ | async)">
+  <div [@incoming] class="tweet card m-2 p-2 px-2">{{tweet.t2}}</div>
 </div>
-<div *ngIf="!(emojiTweetStream$ | async)" class="placeholder">
+<div *ngIf="!(emojiTweetStream$ | async)?.length" class="placeholder">
   Waiting for Tweets
 </div>

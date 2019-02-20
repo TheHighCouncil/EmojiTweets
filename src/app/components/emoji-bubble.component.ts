@@ -1,5 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Component, Input } from '@angular/core';
 
 @Component({
   selector: 'app-emoji-bubble',
@@ -7,7 +6,20 @@ import { Observable } from 'rxjs';
   styleUrls: ['./emoji-bubble.component.scss']
 })
 export class EmojiBubbleComponent {
-  @Input() emojiData;
+  @Input() emojiData: EmojiData;
+  @Input() ranking: number;
 
   constructor() {}
+
+  getRankedClass() {
+    switch (this.ranking) {
+      case 0:
+        return 'first';
+      case 1:
+        return 'second';
+      case 2:
+        return 'third';
+    }
+    return null;
+  }
 }

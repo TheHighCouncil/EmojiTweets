@@ -1,8 +1,8 @@
-<div routerLink="/dashboard" [queryParams]="{emoji: emojiData.emoji}" class="emoji-count-bubble {{emojiData.updated ? 'updated' : ''}}">
-  <div class="emoji ">
+<div routerLink="/dashboard" [queryParams]="{emoji: emojiData.emoji}" class="emoji-count-bubble" [ngClass]="getRankedClass()">
+  <div class="emoji">
     <span>{{emojiData.emoji}}</span>
   </div>
-  <div class="count ">
+  <div class="count">
     <span>{{emojiData.count}}</span>
   </div>
 </div>

@@ -1,26 +1,38 @@
-import { Component, OnInit, OnDestroy, Input } from '@angular/core';
-import { ChangeDetectorRef } from '@angular/core';
+import { Component, Input } from '@angular/core';
+import { trigger, transition, style, animate } from '@angular/animations';
+import { Observable } from 'rxjs';
+import { filter } from 'rxjs/operators';
 
-import { map, mergeMap, sample, toArray, dematerialize, tap, delay } from 'rxjs/operators';
-import { Observable ,  Subscription, of, interval} from 'rxjs';
-
+import { environment } from '../../environments/environment';
 import { queueUp } from '../utils/rxjs.util';
 import { EmojiTrackerService } from '../services/emoji-tracker.service';
 
 @Component({
   selector: 'app-live-count',
   templateUrl: './live-count.component.html',
-  styleUrls: ['./live-count.component.scss']
+  styleUrls: ['./live-count.component.scss'],
+  animations: [
+    trigger('incoming', [
+      transition(':enter', [
+        style({ maxHeight: '0' }),
+        animate(600, style({ maxHeight: '30rem' }))
+      ])
+    ])
+  ]
 })
 export class LiveCountComponent {
   @Input() track = true;
-  public emojiUpdateQueue$: Observable<any>;
+  queueSize = environment.queueSize;
+  emojiUpdateQueue$: Observable<EmojiData[]>;
 
-  constructor(
-    private emojiTrackerService: EmojiTrackerService,
-  ) {
-    this.emojiUpdateQueue$ = emojiTrackerService
-      .emojiUpdatesNotify()
-      .pipe(queueUp(20), sample(interval(500)));
+  constructor(private emojiTrackerService: EmojiTrackerService) {
+    this.emojiUpdateQueue$ = emojiTrackerService.emojiUpdatesNotify().pipe(
+      filter(() => this.track),
+      queueUp(this.queueSize)
+    );
+  }
+
+  trackBy(index: number, emojiData: EmojiData) {
+    return `${emojiData.emoji}_${emojiData.count}`;
   }
 }

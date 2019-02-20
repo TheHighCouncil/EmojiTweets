@@ -1,30 +1,39 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Router, ActivatedRoute, ParamMap } from '@angular/router';
-import { Subscription } from 'rxjs';
-import { ChangeDetectorRef } from '@angular/core';
+import { Component } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import {
+  faPlay,
+  faPause,
+  faTimes,
+  faExclamationCircle
+} from '@fortawesome/free-solid-svg-icons';
+import { Observable, Subject } from 'rxjs';
+import { map } from 'rxjs/operators';
+
+import { environment } from '../../environments/environment';
+import { EmojiTrackerService } from '../services/emoji-tracker.service';
 
 @Component({
   selector: 'app-wrapper',
   templateUrl: './wrapper.component.html',
   styleUrls: ['./wrapper.component.scss']
 })
-export class WrapperComponent implements OnInit, OnDestroy {
+export class WrapperComponent {
+  topNSize = environment.topNSize;
+  faPlay = faPlay;
+  faPause = faPause;
+  faTimes = faTimes;
+  faExclamationCircle = faExclamationCircle;
   track = true;
-  emojiCode: string;
-  routeSubject: Subscription;
+  hasConnectionError$: Subject<boolean>;
+  emojiCode$: Observable<string>;
 
-  constructor(private route: ActivatedRoute, private ref: ChangeDetectorRef) {}
-
-  ngOnInit() {
-    this.routeSubject = this.route.queryParams.subscribe(params => {
-      this.emojiCode = params['emoji'];
-      this.ref.detectChanges(); // TODO check why this is necessary
-    });
-  }
-
-  ngOnDestroy() {
-    if (this.routeSubject) {
-      this.routeSubject.unsubscribe();
-    }
+  constructor(
+    private route: ActivatedRoute,
+    private emojiTrackerService: EmojiTrackerService
+  ) {
+    this.hasConnectionError$ = emojiTrackerService.hasConnectionError$;
+    this.emojiCode$ = this.route.queryParams.pipe(
+      map(params => params['emoji'])
+    );
   }
 }

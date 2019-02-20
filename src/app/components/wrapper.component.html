@@ -1,34 +1,40 @@
 <main class="wrapper">
-  <section class="panel small">
-    <div class="header">
-      <span class="text">Live Changelog</span>
-      <a class="addon icon {{track ? 'live' : ''}}" (click)="track = !track">
-        ◉
-      </a>
+  <div *ngIf="hasConnectionError$ | async" class="error">
+    <fa-icon size="2x" class="m-4" [icon]="faExclamationCircle"></fa-icon>
+    <div>
+      Connection Error
     </div>
-    <div class="content">
-      <app-live-count class="emoji-live-count" [track]="track"></app-live-count>
-    </div>
-  </section>
-  <section class="panel">
-    <div class="header">
-      <span class="text">Top N Emojis</span>
-    </div>
-    <div class="content">
-      <app-top-n class="emoji-top-n"></app-top-n>
-    </div>
-  </section>
-  <section class="panel" *ngIf="emojiCode">
-    <div class="header">
-      <span class="text">Tweet-Stream for
-        <span class="emoji">{{emojiCode}}</span>
-      </span>
-      <a class="addon icon" routerLink="/dashboard">
-        &times;
-      </a>
-    </div>
-    <div class="content">
-      <app-tweet-stream></app-tweet-stream>
-    </div>
-  </section>
+  </div>
+  <ng-container *ngIf="!(hasConnectionError$ | async)">
+    <fa-icon class="fab track btn btn-danger" [icon]="track ? faPause : faPlay" (click)="track = !track"></fa-icon>
+    <section class="panel small">
+      <div class="header">
+        <span class="text">Live Changelog</span>
+      </div>
+      <div class="content">
+        <app-live-count class="emoji-live-count" [track]="track"></app-live-count>
+      </div>
+    </section>
+    <section class="panel">
+      <div class="header">
+        <span class="text">Top {{topNSize}} Emojis</span>
+      </div>
+      <div class="content">
+        <app-top-n class="emoji-top-n" [track]="track"></app-top-n>
+      </div>
+    </section>
+    <section class="panel" *ngIf="emojiCode$ | async">
+      <div class="header">
+        <span class="text">Tweet-Stream for
+          <span class="emoji">{{emojiCode$ | async}}</span>
+        </span>
+        <a class="addon icon" routerLink="/dashboard">
+          <fa-icon [icon]="faTimes"></fa-icon>
+        </a>
+      </div>
+      <div class="content">
+        <app-tweet-stream [track]="track"></app-tweet-stream>
+      </div>
+    </section>
+  </ng-container>
 </main>

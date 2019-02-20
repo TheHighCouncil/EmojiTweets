@@ -1,24 +1,12 @@
 import { Observable } from 'rxjs';
 
-const callArrayCallbacks = (data, cbArray: Array<(data: any) => void>) => {
-  if (cbArray) {
-    for (const cb of cbArray) {
-      cb(data);
-    }
-  }
-};
-
-export const fromEventSource = (url): Observable<any> => {
-  const eventSource = new EventSource(url);
-  const onMessageCbArray = [];
-  const onErrorCbArray = [];
-
-  eventSource.onmessage = event => callArrayCallbacks(event, onMessageCbArray);
-  eventSource.onerror = error => callArrayCallbacks(event, onErrorCbArray);
-
+export const fromEventSource = <T>(url: string): Observable<T> => {
   return new Observable(observer => {
-    onMessageCbArray.push(event => observer.next(JSON.parse(event.data)));
-    onErrorCbArray.push(error => observer.error(error));
+    const eventSource = new EventSource(url);
+    eventSource.addEventListener('message', (event: MessageEvent) =>
+      observer.next(JSON.parse(event.data) as T)
+    );
+    eventSource.addEventListener('error', error => observer.error(error));
     return {
       unsubscribe: () => {
         eventSource.close();
@@ -27,44 +15,30 @@ export const fromEventSource = (url): Observable<any> => {
   });
 };
 
-// export const fromEventSource = url => {
-//   return new Observable(observer => {
-//     const eventSource = new EventSource(url);
-//     eventSource.onmessage = event => {
-//       observer.next(JSON.parse(event.data));
-//     };
-//     eventSource.onerror = error => {
-//       observer.error(error);
-//     };
-//     return {
-//       unsubscribe: () => {
-//         eventSource.close();
-//       }
-//     };
-//   });
-// };
-
-export const queueUp = (maxLength, reset$ = null) => source =>
-  new Observable(observer => {
-    let queue = [];
-    if (reset$) {
-      reset$.subscribe(() => {
-        queue = [];
-      });
-    }
-    return source.subscribe(
-      value => {
-        try {
-          queue.unshift(value);
-          if (queue.length > maxLength) {
-            queue.pop();
-          }
+export const queueUp = (maxLength: number, reset$: Observable<any> = null) => {
+  return <T>(source: Observable<T>): Observable<T[]> =>
+    new Observable(observer => {
+      let queue: T[] = [];
+      if (reset$) {
+        reset$.subscribe(() => {
+          queue = [];
           observer.next(queue);
-        } catch (err) {
-          observer.error(err);
-        }
-      },
-      err => observer.error(err),
-      () => observer.complete()
-    );
-  });
+        });
+      }
+      return source.subscribe(
+        (value: T) => {
+          try {
+            queue.unshift(value);
+            if (queue.length > maxLength) {
+              queue.pop();
+            }
+            observer.next(queue);
+          } catch (err) {
+            observer.error(err);
+          }
+        },
+        err => observer.error(err),
+        () => observer.complete()
+      );
+    });
+};

@@ -1,3 +1,5 @@
+@import '../globals.scss';
+
 .wrapper {
   position: absolute;
   display: flex;
@@ -5,6 +7,15 @@
   height: 100%;
   box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
 }
+
+.error {
+  @extend .flex-center;
+  flex-direction: column;
+  align-self: center;
+  justify-self: center;
+  margin: auto;
+}
+
 .panel {
   display: flex;
   overflow: hidden;
@@ -15,22 +26,19 @@
     display: flex;
     width: 100%;
     height: 2.8rem;
-    background: #9E9E9E;
+    background: #444;
     color: #fff;
     font-size: 14pt;
     text-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
     box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
 
     .text {
-      display: flex;
+      @extend .flex-center;
+
       flex: 1;
-      align-items: center;
-      justify-content: center;
     }
     .addon {
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      @extend .flex-center;
     }
   }
   .content {
@@ -44,8 +52,24 @@
   }
 }
 
+.fab {
+  @extend .flex-center;
+  position: absolute;
+  bottom: 1.1rem;
+  right: 1.1rem;
+  width: 3rem;
+  height: 3rem;
+  z-index: 666;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+
+  &:hover {
+    cursor: pointer;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+  }
+}
+
 .panel {
-  border-left: 1px solid #ccc;
+  border-left: 1px solid $primary;
 }
 .panel:first-of-type {
   border-left: none;
@@ -72,15 +96,15 @@
   }
 }
 
+$emoji-size: 2rem;
+
 .emoji {
+  @extend .flex-center;
+
   font-size: 1.3rem;
-  text-align: center;
-  line-height: 1.8rem;
-  padding-top: 2px;
-  width: 1.8rem;
-  height: 1.8rem;
-  margin: 0.3rem;
+  width: $emoji-size;
+  height: $emoji-size;
+  margin: 0 0.5rem;
   border-radius: 50%;
   background: #fff;
-  box-shadow: inset 0 1px 3px rgba(0,0,0,0.12), inset 0 1px 2px rgba(0,0,0,0.24);
 }

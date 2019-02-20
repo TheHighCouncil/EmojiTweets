@@ -1,8 +1,22 @@
+@import '../globals.scss';
+
+.wrapper {
+  @extend .flex-center;
+}
+
 .placeholder {
+  @extend .flex-center;
+
   height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
   font-size: 16pt;
-  color: #ccc;
+  color: $text-secondary;
+}
+
+.tweet {
+  margin: auto;
+  max-width: 28rem;
+  width: 100%;
+  border-color: $primary;
+  color: $text-primary;
+  background: $primary;
 }

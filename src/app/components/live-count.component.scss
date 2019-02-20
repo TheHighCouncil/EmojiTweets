@@ -1,7 +1,6 @@
+@import '../globals.scss';
+
 .wrapper {
-  display: flex;
+  @extend .flex-center;
   flex-direction: column;
-  justify-content: center;
-  align-content: center;
-  align-items: center;
 }

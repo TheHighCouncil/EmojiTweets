@@ -1,6 +1,4 @@
-import { Component, OnInit } from '@angular/core';
-
-import { EmojiTrackerService } from './services/emoji-tracker.service';
+import { Component } from '@angular/core';
 
 @Component({
   selector: 'app-root',
